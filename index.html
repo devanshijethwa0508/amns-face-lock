@@ -65,7 +65,6 @@
 
   <script>
     const PASSWORD = "amns123";
-    const UNLOCK_FACE = null;
     let faceMatcher;
 
     async function startFaceCheck() {
@@ -92,9 +91,15 @@
 
     async function setupCamera() {
       const video = document.getElementById("video");
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-      video.srcObject = stream;
-      return new Promise(resolve => video.onloadedmetadata = resolve);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        video.srcObject = stream;
+        return new Promise(resolve => video.onloadedmetadata = resolve);
+      } catch (err) {
+        document.getElementById("status").textContent =
+          "❌ Cannot access camera: " + err.message;
+        document.getElementById("status").style.color = "red";
+      }
     }
 
     async function detectFace() {
